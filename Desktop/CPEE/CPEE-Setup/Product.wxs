@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+  <Product Id="*" Name="CPEE" Language="1033" Version="1.0.0.0" Manufacturer="BFC" UpgradeCode="b27a400d-ae5a-4566-a564-743865ab579a">
+    <Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." Schedule="afterInstallExecute" />
+    <MediaTemplate />
+    <WixVariable Id="WixUILicenseRtf" Value="..\CPEE\GPLv3.rtf" />
+    <PropertyRef Id="NETFRAMEWORK40FULL"/>
+    <PropertyRef Id="NETFRAMEWORK45"/>
+    <Icon Id="ProductIcon" SourceFile="..\CPEE\bin\Release\cpee.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="ProductIcon"/>
+    <Property Id="ARPNOREPAIR" Value="1"/>
+    <Property Id="INSTALLSHORTCUT" />
+    <Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONROOTDIRECTORY" />
+
+    <Upgrade Id="{48A80B54-BE01-438D-9ACA-D6A62881909F}">
+      <UpgradeVersion Minimum="0.0.0" OnlyDetect="yes" Property="NEWERVERSIONDETECTED"/>
+      <UpgradeVersion Minimum="0.0.0" IncludeMinimum="yes" IncludeMaximum="no"
+                      Property="OLDERVERSIONBEINGUPGRADED"/>
+    </Upgrade>
+
+    <Condition Message="A newer version of this software is already installed.">NOT NEWERVERSIONDETECTED</Condition>
+
+    <Condition Message='This setup requires Microsoft .NET Framework 4.0 Full or 4.5 package or greater needs to be installed for this installation to continue.'>
+      <![CDATA[Installed OR NETFRAMEWORK40FULL OR NETFRAMEWORK45]]>
+    </Condition>
+
+
+    <!-- The following three sections are from the How To: Add a File to Your Installer topic-->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="APPLICATIONROOTDIRECTORY" Name="CPEE"/>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="CPEE"/>
+      </Directory>
+      <Directory Id="Desktop">
+        <Directory Id="DesktopFolder" Name="CPEE"/>
+      </Directory>
+    </Directory>
+
+    <DirectoryRef Id="APPLICATIONROOTDIRECTORY">
+      <Component Id="cpee.exe" Guid="{5FC5DC9F-021B-4CF7-A74C-F6751DD01FA3}">
+        <File Id="cpee.exe" Source="..\CPEE\bin\Release\cpee.exe" KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Id="cpee.exe.config" Guid="{5F10FC06-6509-4273-BF52-1E077AE4D31C}">
+        <File Id="cpee.exe.config" Source="..\CPEE\bin\Release\cpee.exe.config" KeyPath="yes"/>
+      </Component>
+      <Component Id="cpee.exe.manifest" Guid="{2ED6CEF7-9B47-41DC-9294-FCCE399F851F}">
+        <File Id="cpee.exe.manifest" Source="..\CPEE\bin\Release\cpee.exe.manifest" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="{898A931B-E3D8-45E3-85CD-BD0B94FCD0CB}">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+             Name="CPEE"
+           Description="Componenta pret energie electrica"
+            Target="[#cpee.exe]"
+                  WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="ApplicationDesktopShortcut" Guid="{970C0C72-F598-426D-BB0D-151CB786C25C}">
+        <Condition>INSTALLSHORTCUT</Condition>
+        <Shortcut Id="ApplicationDesktopShortcut"
+             Name="CPEE"
+           Description="Componenta pret energie electrica"
+            Target="[#cpee.exe]"
+                  WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+        <RemoveFolder Id="DesktopFolder" On="uninstall"/>
+      <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <Feature Id="MainApplication" Title="CPEE" Level="1">
+      <ComponentRef Id="cpee.exe" />
+      <ComponentRef Id="cpee.exe.config" />
+      <ComponentRef Id="cpee.exe.manifest" />
+      <ComponentRef Id="ApplicationShortcut" />
+      <ComponentRef Id="ApplicationDesktopShortcut" />
+    </Feature>
+
+    <!-- Step 2: Add UI to your installer / Step 4: Trigger the custom action -->
+    <UI>
+      <UIRef Id="Custom_InstallDir" />
+      <Publish Dialog="ExitDialog"
+          Control="Finish"
+          Event="DoAction"
+          Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+    </UI>
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch CPEE" />
+
+    <!-- Step 3: Include the custom action -->
+    <Property Id="WixShellExecTarget" Value="[#cpee.exe]" />
+    <CustomAction Id="LaunchApplication"
+        BinaryKey="WixCA"
+        DllEntry="WixShellExec"
+        Impersonate="yes" />
+    <InstallExecuteSequence>
+        <Custom Action="LaunchApplication" After="InstallFinalize">Checkbox1 = 1 and NOT Installed</Custom>
+    </InstallExecuteSequence>
+  </Product>
+</Wix>
