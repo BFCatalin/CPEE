@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
-  <Product Id="*" Name="CPEE" Language="1033" Version="1.0.0.0" Manufacturer="BFC" UpgradeCode="b27a400d-ae5a-4566-a564-743865ab579a">
+  <Product Id="*" Name="CPEE" Language="1033" Version="1.0.1.0" Manufacturer="BFC" UpgradeCode="b27a400d-ae5a-4566-a564-743865ab579a">
     <Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine" />
-    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." Schedule="afterInstallExecute" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." Schedule="afterInstallInitialize" />
     <MediaTemplate />
     <WixVariable Id="WixUILicenseRtf" Value="..\CPEE\GPLv3.rtf" />
     <PropertyRef Id="NETFRAMEWORK40FULL"/>
@@ -14,8 +14,8 @@
     <Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONROOTDIRECTORY" />
 
     <Upgrade Id="{48A80B54-BE01-438D-9ACA-D6A62881909F}">
-      <UpgradeVersion Minimum="0.0.0" OnlyDetect="yes" Property="NEWERVERSIONDETECTED"/>
-      <UpgradeVersion Minimum="0.0.0" IncludeMinimum="yes" IncludeMaximum="no"
+      <UpgradeVersion Minimum="010.0" OnlyDetect="yes" Property="NEWERVERSIONDETECTED"/>
+      <UpgradeVersion Minimum="1.0.0" IncludeMinimum="yes" IncludeMaximum="no"
                       Property="OLDERVERSIONBEINGUPGRADED"/>
     </Upgrade>
 
@@ -40,14 +40,11 @@
     </Directory>
 
     <DirectoryRef Id="APPLICATIONROOTDIRECTORY">
-      <Component Id="cpee.exe" Guid="{5FC5DC9F-021B-4CF7-A74C-F6751DD01FA3}">
-        <File Id="cpee.exe" Source="..\CPEE\bin\Release\cpee.exe" KeyPath="yes" Checksum="yes"/>
-      </Component>
-      <Component Id="cpee.exe.config" Guid="{5F10FC06-6509-4273-BF52-1E077AE4D31C}">
-        <File Id="cpee.exe.config" Source="..\CPEE\bin\Release\cpee.exe.config" KeyPath="yes"/>
-      </Component>
-      <Component Id="cpee.exe.manifest" Guid="{2ED6CEF7-9B47-41DC-9294-FCCE399F851F}">
-        <File Id="cpee.exe.manifest" Source="..\CPEE\bin\Release\cpee.exe.manifest" KeyPath="yes"/>
+      <Component Id="AllFiles" Guid="{5FC5DC9F-021B-4CF7-A74C-F6751DD01FA3}">
+        <File Id="cpee.exe" Source="..\CPEE\bin\Release\cpee.exe" Checksum="yes"/>
+        <File Id="cpee.exe.config" Source="..\CPEE\bin\Release\cpee.exe.config" />
+        <File Id="cpee.exe.manifest" Source="..\CPEE\bin\Release\cpee.exe.manifest" />
+        <File Id="defaultDoc" Source="..\CPEE\bin\Release\Componenta pret energie electrica.cpee" />
       </Component>
     </DirectoryRef>
 
@@ -77,9 +74,7 @@
     </DirectoryRef>
 
     <Feature Id="MainApplication" Title="CPEE" Level="1">
-      <ComponentRef Id="cpee.exe" />
-      <ComponentRef Id="cpee.exe.config" />
-      <ComponentRef Id="cpee.exe.manifest" />
+      <ComponentRef Id="AllFiles" />
       <ComponentRef Id="ApplicationShortcut" />
       <ComponentRef Id="ApplicationDesktopShortcut" />
     </Feature>
