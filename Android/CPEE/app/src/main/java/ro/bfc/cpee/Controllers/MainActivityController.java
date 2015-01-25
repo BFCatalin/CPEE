@@ -1,5 +1,6 @@
 package ro.bfc.cpee.Controllers;
 
+import android.content.Intent;
 import android.net.Uri;
 
 import ro.bfc.cpee.models.CPEEDocument;
@@ -19,19 +20,33 @@ public class MainActivityController {
     IMainActivityView activity;
     Total total;
 
-    public MainActivityController(CPEEDocument document, IMainActivityView activity) {
-        this.document = document;
+    public MainActivityController(IMainActivityView activity) {
         this.activity = activity;
         total = new Total();
-        total.setGlobalPrices(document.Global);
+        if(document != null)
+            total.setGlobalPrices(document.Global);
     }
 
-    public void init() {
+    public void init(Intent intent) {
+        if(intent != null && intent.getData() != null) {
+            try {
+                final Uri filePath = intent.getData();
+                loadModel(filePath);
+            }
+            catch (Exception e){
+                this.activity.showMessageLong(e.getMessage());
+            }
+        }else{
+            this.document = FileUtils.readFromInternalStorage(this.activity.getContext(), "valori.cpee");
+        }
+
         if(this.document != null){
-            activity.updateCounties();
+            this.activity.setDocument(this.document);
+            this.total.setGlobalPrices(document.Global);
+            this.activity.updateCounties();
         }
         else
-            activity.showMessageLong("Nu exista valori definite. Incarcati un document CPEE.");
+            this.activity.showMessageLong("Nu exista valori definite. Incarcati un document CPEE.");
     }
 
     public void loadModel(Uri uri) {
@@ -40,7 +55,6 @@ public class MainActivityController {
         if(doc != null){
             FileUtils.saveToInternalStorage(this.activity.getContext(), "valori.cpee", doc);
             this.document = doc;
-            this.activity.updateCounties();
         }
         } catch (Exception e) {
             this.activity.showMessageLong(e.getMessage());

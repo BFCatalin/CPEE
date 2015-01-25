@@ -3,6 +3,7 @@ package ro.bfc.cpee;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
@@ -30,7 +31,6 @@ import ro.bfc.cpee.models.CPEEDocument;
 import ro.bfc.cpee.models.County;
 import ro.bfc.cpee.models.Total;
 import ro.bfc.cpee.models.TotalComponent;
-import ro.bfc.cpee.utils.FileUtils;
 import ro.bfc.cpee.views.IMainActivityView;
 
 
@@ -54,13 +54,17 @@ public class MainActivity extends ActionBarActivity implements IMainActivityView
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initiateSpinners();
-        initiatePriceField();
-        initiateExpandableList();
-
-        document = FileUtils.readFromInternalStorage(this, "valori.cpee");
-        controller = new MainActivityController(document, this);
-        controller.init();
+        try {
+            initiateSpinners();
+            initiatePriceField();
+            initiateExpandableList();
+            Intent intent = getIntent();
+            controller = new MainActivityController(this);
+            controller.init(intent);
+        }
+        catch (Exception e){
+            this.showMessageLong(e.getMessage());
+        }
     }
 
     private void initiateExpandableList() {
@@ -69,16 +73,6 @@ public class MainActivity extends ActionBarActivity implements IMainActivityView
         expListView = (ExpandableListView) findViewById(R.id.expandableListView);
         expListAdapter = new ExpandableListAdapter(this, groupList, totalComponents);
         expListView.setAdapter(expListAdapter);
-
-        /*
-        expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                final String selected = (String) expListAdapter.getChild(groupPosition, childPosition);
-                Toast.makeText(getBaseContext(), selected, Toast.LENGTH_LONG).show();
-                return true;
-            }
-        });
-        */
     }
 
     private void initiatePriceField() {
@@ -175,18 +169,7 @@ public class MainActivity extends ActionBarActivity implements IMainActivityView
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_open){
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("*/*");
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            try {
-                startActivityForResult(
-                        Intent.createChooser(intent, "Select a File to Upload"),
-                        FILE_SELECT_CODE);
-            } catch (android.content.ActivityNotFoundException ex) {
-                // Potentially direct the user to the Market with a Dialog
-                this.showMessageShort("Please install a File Manager.");
-            }
-
+            openFile("*/*");
             return true;
         }
 
@@ -216,7 +199,14 @@ public class MainActivity extends ActionBarActivity implements IMainActivityView
     @Override
     public void updateCounties() {
         if(document != null){
-            countySpinnerAdapter.addAll(document.Counties);
+            countySpinnerAdapter.clear();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                countySpinnerAdapter.addAll(document.Counties);
+            } else {
+                for(County item: document.Counties) {
+                    countySpinnerAdapter.add(item);
+                }
+            }
         }
     }
 
@@ -245,6 +235,40 @@ public class MainActivity extends ActionBarActivity implements IMainActivityView
                 totalComponents.put(t, total.getTotalComponents());
                 expListAdapter.notifyDataSetChanged();
             }
+        }
+    }
+
+    @Override
+    public void setDocument(CPEEDocument document) {
+        this.document = document;
+    }
+
+    public void openFile(String mimeType) {
+
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType(mimeType);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        // special intent for Samsung file manager
+        Intent sIntent = new Intent("com.sec.android.app.myfiles.PICK_DATA");
+        // if you want any file type, you can skip next line
+        sIntent.putExtra("CONTENT_TYPE", mimeType);
+        sIntent.addCategory(Intent.CATEGORY_DEFAULT);
+
+        Intent chooserIntent;
+        if (getPackageManager().resolveActivity(sIntent, 0) != null){
+            // it is device with samsung file manager
+            chooserIntent = Intent.createChooser(sIntent, "Open file");
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] { intent});
+        }
+        else {
+            chooserIntent = Intent.createChooser(intent, "Open file");
+        }
+
+        try {
+            startActivityForResult(chooserIntent, FILE_SELECT_CODE);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(getApplicationContext(), "No suitable File Manager was found.", Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -21,4 +21,6 @@ public interface IMainActivityView {
     void showMessageLong(String message);
 
     void updateTotal(Total total);
+
+    void setDocument(CPEEDocument document);
 }
