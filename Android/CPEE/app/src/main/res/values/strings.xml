@@ -8,7 +8,7 @@
     <string name="coin">Lei</string>
     <string name="total">Total</string>
     <string name="judet_select">[Judet]</string>
-    <string name="nivelEnergetic_select">[Nivel energetic]</string>
+    <string name="nivelEnergetic_select">[Nivel tensiune]</string>
 
     <string name="contribCogen">Contibutie Cogen</string>
     <string name="tarifServSistem">Tarfi serv sistem</string>
@@ -19,8 +19,8 @@
     <string name="tarifDistJT">Tarif distributie JT</string>
 
     <string-array name="nivelEnergetic">
-        <item>Tensiune inalta</item>
-        <item>Tensiune medie</item>
-        <item>Tensiune joasa</item>
+        <item>Inalta tensiune</item>
+        <item>Medie tensiune</item>
+        <item>Joasa tensiune</item>
     </string-array>
 </resources>
