@@ -23,4 +23,6 @@ public interface IMainActivityView {
     void updateTotal(Total total);
 
     void setDocument(CPEEDocument document);
+
+    void updateDistrib(String name);
 }

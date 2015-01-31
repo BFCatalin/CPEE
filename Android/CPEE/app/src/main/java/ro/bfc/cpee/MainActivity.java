@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class MainActivity extends ActionBarActivity implements IMainActivityView
     Map<Double, List<TotalComponent>> totalComponents;
     ExpandableListView expListView;
     ExpandableListAdapter expListAdapter;
+    TextView textDistrib;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,7 @@ public class MainActivity extends ActionBarActivity implements IMainActivityView
         setContentView(R.layout.activity_main);
 
         try {
+            textDistrib = (TextView) findViewById(R.id.text_distribuitor);
             initiateSpinners();
             initiatePriceField();
             initiateExpandableList();
@@ -85,13 +88,23 @@ public class MainActivity extends ActionBarActivity implements IMainActivityView
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 price = (EditText) findViewById(R.id.price);
-                controller.setPretBaza(Double.parseDouble(price.getText().toString()));
+                String priceString = price.getText().toString().trim();
+                Double dPrice= 0.0;
+                if(!priceString.isEmpty()) {
+                    dPrice = Double.parseDouble(priceString);
+                }
+                controller.setPretBaza(dPrice);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 price = (EditText) findViewById(R.id.price);
-                controller.setPretBaza(Double.parseDouble(price.getText().toString()));
+                String priceString = price.getText().toString().trim();
+                Double dPrice= 0.0;
+                if(!priceString.isEmpty()) {
+                    dPrice = Double.parseDouble(priceString);
+                }
+                controller.setPretBaza(dPrice);
             }
         });
     }
@@ -198,12 +211,12 @@ public class MainActivity extends ActionBarActivity implements IMainActivityView
 
     @Override
     public void updateCounties() {
-        if(document != null){
+        if(this.document != null){
             countySpinnerAdapter.clear();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                countySpinnerAdapter.addAll(document.Counties);
+                countySpinnerAdapter.addAll(this.document.Counties);
             } else {
-                for(County item: document.Counties) {
+                for(County item: this.document.Counties) {
                     countySpinnerAdapter.add(item);
                 }
             }
@@ -236,6 +249,16 @@ public class MainActivity extends ActionBarActivity implements IMainActivityView
                 expListAdapter.notifyDataSetChanged();
             }
         }
+        else {
+            groupList.clear();
+            totalComponents.clear();
+            expListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void updateDistrib(String name) {
+        textDistrib.setText(name);
     }
 
     @Override

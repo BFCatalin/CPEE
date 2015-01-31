@@ -41,8 +41,8 @@ public class MainActivityController {
         }
 
         if(this.document != null){
-            this.activity.setDocument(this.document);
             this.total.setGlobalPrices(document.Global);
+            this.activity.setDocument(this.document);
             this.activity.updateCounties();
         }
         else
@@ -69,6 +69,7 @@ public class MainActivityController {
             if(countyPrice != null){
                 total.setPrice(countyPrice);
                 this.activity.updateTotal(total);
+                this.activity.updateDistrib(countyPrice.Name);
             }
             else this.activity.showMessageShort(String.format("Pret invalid pentru judetul '%s'.", county.Name));
         }
@@ -85,7 +86,12 @@ public class MainActivityController {
 
     public void setPretBaza(double pretBaza) {
         total.setPretBaza(pretBaza);
-        this.activity.updateTotal(total);
+        if(pretBaza == 0){
+            this.activity.updateTotal(null);
+        }
+        else {
+            this.activity.updateTotal(total);
+        }
     }
 
     public void refreshTotal(){
