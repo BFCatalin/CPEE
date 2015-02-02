@@ -2,8 +2,8 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
   <Product Id="*" Name="CPEE" Language="1033" Version="1.0.1.0" Manufacturer="BFC" UpgradeCode="b27a400d-ae5a-4566-a564-743865ab579a">
     <Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine" />
+    <Media Id="1" Cabinet="cpee.cab" EmbedCab="yes"/>
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." Schedule="afterInstallInitialize" />
-    <MediaTemplate />
     <WixVariable Id="WixUILicenseRtf" Value="..\CPEE\GPLv3.rtf" />
     <PropertyRef Id="NETFRAMEWORK40FULL"/>
     <PropertyRef Id="NETFRAMEWORK45"/>
